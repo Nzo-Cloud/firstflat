@@ -1,0 +1,6 @@
+@FirstFlat.Api_HostAddress = http://localhost:5147
+
+GET {{FirstFlat.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
