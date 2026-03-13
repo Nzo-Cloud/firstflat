@@ -4,14 +4,28 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { Leaf, Eye, EyeOff, Loader2, Shield } from 'lucide-react'
+import { Leaf, Eye, EyeOff, Loader2, Shield, Info } from 'lucide-react'
+import { useEffect } from 'react'
 
 export default function SignupPage() {
   const [form, setForm] = useState({ email: '', password: '', username: '' })
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [status, setStatus] = useState('')
   const router = useRouter()
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+    if (loading) {
+      timer = setTimeout(() => {
+        setStatus('Waking up the free-tier server... this usually takes ~40 seconds. ☕')
+      }, 4000)
+    } else {
+      setStatus('')
+    }
+    return () => clearTimeout(timer)
+  }, [loading])
 
   const update = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(f => ({ ...f, [key]: e.target.value }))
@@ -49,6 +63,14 @@ export default function SignupPage() {
             <strong>FirstFlat does not collect payment information.</strong> This app is completely free to use.
           </p>
         </div>
+
+        {/* Status notification bar */}
+        {status && !error && (
+          <div className="mb-4 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-center gap-3 animate-pulse">
+            <Info className="w-5 h-5 text-blue-500 flex-shrink-0" />
+            <p className="text-sm text-blue-700 font-medium">{status}</p>
+          </div>
+        )}
 
         <div className="card shadow-xl border-0">
           <form onSubmit={handleSubmit} className="space-y-4">

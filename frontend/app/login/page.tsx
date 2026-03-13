@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Leaf, Eye, EyeOff, Loader2, CheckCircle, AlertCircle, Info } from 'lucide-react'
+import { useEffect } from 'react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -14,6 +15,16 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [status, setStatus] = useState('')       // visible status bar
   const router = useRouter()
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+    if (loading) {
+      timer = setTimeout(() => {
+        setStatus('Waking up the free-tier server... this usually takes ~40 seconds. ☕')
+      }, 4000)
+    }
+    return () => clearTimeout(timer)
+  }, [loading])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
