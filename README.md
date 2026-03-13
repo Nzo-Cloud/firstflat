@@ -145,15 +145,15 @@ npm run dev
 4. Add environment variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `NEXT_PUBLIC_API_URL` = your Railway backend URL
+   - `NEXT_PUBLIC_API_URL` = your Render backend URL
 5. Deploy
 
-### Backend → Railway
+### Backend → Render (Free)
 
-1. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub
+1. Go to [render.com](https://render.com) → **New** → **Web Service**
 2. Select your repo, set **Root Directory** to `backend`
-3. Railway will auto-detect .NET
-4. Add environment variables (all the `Supabase:*` and `Anthropic:*` keys):
+3. Render will auto-detect the Dockerfile
+4. Expand **Advanced** and add environment variables (all the `Supabase__*` and `Anthropic__*` keys):
    ```
    Supabase__Url=https://...
    Supabase__JwtSecret=...
@@ -163,7 +163,7 @@ npm run dev
    ```
 5. Deploy → copy the public URL → update `NEXT_PUBLIC_API_URL` in Vercel
 
-> **Note:** Railway uses `__` as separator for nested JSON keys (e.g., `Supabase__JwtSecret` maps to `Supabase.JwtSecret`)
+> **Note:** We use `__` as a safe separator for nested JSON keys in Linux environment variables (e.g., `Supabase__JwtSecret` maps to `Supabase:JwtSecret` in .NET)
 
 ### Database → Supabase (free tier)
 
