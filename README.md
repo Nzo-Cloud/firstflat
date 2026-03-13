@@ -1,195 +1,192 @@
 # FirstFlat 🌿
 
-> A budget tracker made for people living alone for the first time — students, fresh grads, and young professionals. Track income, expenses, and predict when your money runs out.
+> Budget smarter. Live better.
 
-**Stack:** Next.js 14 (TypeScript + TailwindCSS) · ASP.NET Core Web API (.NET 10) · Supabase (Auth + PostgreSQL) · Anthropic Claude AI
+**The budget tracker built for people living alone for the first time.**
+
+[![Live Site](https://img.shields.io/badge/Live%20Site-firstflat.vercel.app-green?style=flat-square)](https://firstflat.vercel.app)
+[![GitHub](https://img.shields.io/badge/GitHub-Nzo--Cloud%2Ffirstflat-black?style=flat-square&logo=github)](https://github.com/Nzo-Cloud/firstflat)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)](https://nextjs.org)
+[![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-10.0-purple?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green?style=flat-square&logo=supabase)](https://supabase.com)
+
+---
+
+## What Is This
+
+FirstFlat is a free budget tracker designed for people who are living alone for the first time — students, fresh graduates, and young professionals who need help figuring out where their money goes.
+
+Most budget apps are built for people who already know how to budget. FirstFlat is built for people who are learning.
+
+**No ads. No paywalls. No payment information required.**
 
 ---
 
 ## Features
 
-- 💰 **Survival Mode Dashboard** — Hero balance with green/yellow/red indicator
-- 📊 **Budget Overview** — Per-category spending vs limits with progress bars
-- 🔮 **AI Spend Forecast** — Claude-powered prediction of when money runs out
-- 📋 **Transactions** — Full CRUD with search and filters
-- 🏷️ **Categories** — Essential vs non-essential with monthly limits
-- 🧾 **Bills Tracker** — Recurring bills with due dates and paid/unpaid toggle
-- ⚙️ **Settings** — Profile, currency, password, Ko-fi support link
-- 🧙 **Onboarding Wizard** — 5-step setup after signup
-- 🌍 **Worldwide currencies** — 35+ supported
+- **Survival Mode Dashboard** — One big number showing exactly how much money you have left this month, color-coded green/yellow/red based on how close you are to running out
+- **Spend Forecast** — AI-powered prediction of when your budget will run out based on your spending pattern, with actionable suggestions to cut back
+- **Essential vs Non-Essential Tagging** — Categorize every expense so you can see at a glance what you need vs what you want
+- **Bill Reminders** — Track recurring bills with due dates so you never miss rent or utilities again
+- **Budget Overview** — Per-category spending vs your monthly limits with progress bars and CSV export
+- **Onboarding Wizard** — 5-step setup that guides first-timers through setting income, currency, category limits, and recurring bills
+- **Multi-Currency Support** — 35+ currencies for users worldwide
+- **Secure Per-User Data** — Row Level Security ensures users only ever see their own data
 
 ---
 
-## Project Structure
+## Why I Built This
+
+I'm a junior software developer from Davao, Philippines, planning to move abroad with my girlfriend once I land my first job. Before that happens, we need to get serious about budgeting — saving for visa fees, flights, deposits, and everything else that comes with starting fresh somewhere new.
+
+I couldn't find a budget app that felt approachable for someone just starting out. Most were either too complex or too basic. So I built FirstFlat — partly to solve a real problem, and partly to learn the skills I need to get hired.
+
+---
+
+## Technical Decisions
+
+| Decision | Choice | Why |
+|----------|--------|-----|
+| Frontend | Next.js 14 + TypeScript | Already familiar from previous projects, strong ecosystem |
+| Backend | ASP.NET Core 10 Web API | Learning C# for junior developer roles — this was my first production REST API |
+| Database + Auth | Supabase (PostgreSQL) | Free tier, built-in auth, Row Level Security for per-user data isolation |
+| Frontend Deploy | Vercel | Free, seamless Next.js integration |
+| Backend Deploy | Render.com (Docker) | Free tier, supports .NET via Docker containers |
+| Keep-Alive | UptimeRobot | Prevents Render free tier cold starts at zero cost |
+| AI Forecast | Anthropic Claude API | Best structured JSON output for financial analysis |
+
+---
+
+## Architecture
 
 ```
-Firstflat/
-├── frontend/          # Next.js 14 + TypeScript + TailwindCSS
-├── backend/           # ASP.NET Core Web API (.NET 10)
-├── supabase/
-│   ├── schema.sql     # Run first
-│   └── rls.sql        # Run second
-└── README.md
+User Browser
+     │
+     ▼
+Next.js Frontend (Vercel)
+     │
+     ├── Supabase Auth (JWT tokens)
+     │
+     └── ASP.NET Core API (Render.com)
+              │
+              ├── Supabase PostgreSQL (database)
+              │    └── Row Level Security (per-user isolation)
+              │
+              └── Anthropic Claude API (spend forecast)
 ```
 
 ---
 
-## Prerequisites
+## What I Learned Building This
+
+- **JWT authentication across separate services** — Supabase issues tokens on the frontend; the ASP.NET backend validates them using JWKS discovery. Debugging the redirect loop that happened when the backend rejected valid tokens taught me how auth flows actually work in production.
+
+- **Docker deployment on Render** — Render detected Node.js instead of .NET because of a `package-lock.json` in the root. Learning why Docker build context matters and how multi-stage builds work was a real lesson in deployment infrastructure.
+
+- **Row Level Security in PostgreSQL** — Setting up RLS policies so users can only read and write their own data, and understanding how Supabase enforces this at the database level.
+
+- **Connecting three separate services** — Frontend, backend, and database each deployed separately with their own environment variables and CORS configuration. Getting them to trust each other in production was harder than expected.
+
+- **Graceful degradation** — When the AI forecast feature had no API credits, instead of showing a crash, the app falls back to showing real database stats with a friendly message. Handling failures gracefully is something you only learn by watching things fail.
+
+---
+
+## Local Development
+
+### Prerequisites
 
 - Node.js 18+
 - .NET 10 SDK
-- A Supabase project (free tier works)
-- Anthropic API key (for Forecast feature)
+- Supabase account
 
----
+### Setup
 
-## 1. Supabase Setup
+```bash
+# Clone the repo
+git clone https://github.com/Nzo-Cloud/firstflat.git
+cd firstflat
+```
 
-1. Create a project at [supabase.com](https://supabase.com)
-2. In the **SQL Editor**, run in order:
-   - `supabase/schema.sql`
-   - `supabase/rls.sql`
-
-3. Get these values from **Settings → API**:
-   - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
-   - `anon public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `JWT Secret` (Settings → API → JWT Settings) → `Supabase:JwtSecret`
-   - `service_role` key → `Supabase:ServiceRoleKey`
-
-4. Get your database connection string from **Settings → Database → Connection string (URI)** and format it for Npgsql:
-   ```
-   Host=db.YOUR_REF.supabase.co;Database=postgres;Username=postgres.YOUR_REF;Password=YOUR_DB_PASSWORD;Port=5432;SSL Mode=Require;Trust Server Certificate=true
-   ```
-
----
-
-## 2. Backend Setup (ASP.NET Core)
+### Backend
 
 ```bash
 cd backend
-cp appsettings.json appsettings.Development.json
 ```
 
-Edit `appsettings.Development.json`:
+Create `appsettings.Development.json`:
+
 ```json
 {
   "Supabase": {
-    "Url": "https://YOUR_PROJECT_REF.supabase.co",
+    "Url": "YOUR_SUPABASE_URL",
     "JwtSecret": "YOUR_JWT_SECRET",
-    "ConnectionString": "Host=db.YOUR_REF.supabase.co;Database=postgres;Username=postgres.YOUR_REF;Password=YOUR_PASSWORD;Port=5432;SSL Mode=Require;Trust Server Certificate=true"
+    "ConnectionString": "YOUR_CONNECTION_STRING"
   },
   "Anthropic": {
-    "ApiKey": "sk-ant-YOUR_ANTHROPIC_API_KEY"
+    "ApiKey": "YOUR_ANTHROPIC_API_KEY"
   },
-  "AllowedOrigins": ["http://localhost:3000"]
+  "AllowedOrigins": [
+    "http://localhost:3000"
+  ]
 }
 ```
 
 ```bash
-dotnet restore
 dotnet run
-# API now at http://localhost:5000
+# Runs on http://localhost:5147
 ```
 
----
-
-## 3. Frontend Setup (Next.js)
+### Frontend
 
 ```bash
 cd frontend
-cp .env.local.example .env.local
 ```
 
-Edit `.env.local`:
-```
-NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_ANON_KEY
-NEXT_PUBLIC_API_URL=http://localhost:5000
+Create `.env.local`:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+NEXT_PUBLIC_API_URL=http://localhost:5147
 ```
 
 ```bash
 npm install
 npm run dev
-# App now at http://localhost:3000
+# Runs on http://localhost:3000
 ```
 
----
+### Database
 
-## 4. Environment Variables Reference
+Run these SQL files in your Supabase SQL Editor in order:
 
-### Frontend (`.env.local`)
-| Variable | Description |
-|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
-| `NEXT_PUBLIC_API_URL` | Backend URL (http://localhost:5000 locally) |
-
-### Backend (`appsettings.json`)
-| Key | Description |
-|-----|-------------|
-| `Supabase:Url` | Supabase project URL |
-| `Supabase:JwtSecret` | JWT secret (from Supabase API settings) |
-| `Supabase:ConnectionString` | Direct PostgreSQL connection string |
-| `Anthropic:ApiKey` | Anthropic API key for AI forecast |
-| `AllowedOrigins` | Frontend URL(s) for CORS |
+1. `supabase/schema.sql`
+2. `supabase/rls.sql`
 
 ---
 
-## 5. Deployment
+## Deployment
 
-### Frontend → Vercel
-
-1. Push project to GitHub
-2. Import repo at [vercel.com/new](https://vercel.com/new)
-3. Set **Root Directory** to `frontend`
-4. Add environment variables:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `NEXT_PUBLIC_API_URL` = your Render backend URL
-5. Deploy
-
-### Backend → Render (Free)
-
-1. Go to [render.com](https://render.com) → **New** → **Web Service**
-2. Select your repo, set **Root Directory** to `backend`
-3. Render will auto-detect the Dockerfile
-4. Expand **Advanced** and add environment variables (all the `Supabase__*` and `Anthropic__*` keys):
-   ```
-   Supabase__Url=https://...
-   Supabase__JwtSecret=...
-   Supabase__ConnectionString=...
-   Anthropic__ApiKey=sk-ant-...
-   AllowedOrigins__0=https://YOUR_APP.vercel.app
-   ```
-5. Deploy → copy the public URL → update `NEXT_PUBLIC_API_URL` in Vercel
-
-> **Note:** We use `__` as a safe separator for nested JSON keys in Linux environment variables (e.g., `Supabase__JwtSecret` maps to `Supabase:JwtSecret` in .NET)
-
-### Database → Supabase (free tier)
-
-Already set up in Step 1. No additional deployment needed.
+| Service | Platform | Notes |
+|---------|----------|-------|
+| Frontend | Vercel | Auto-deploys on push to main |
+| Backend | Render.com | Docker runtime, free tier |
+| Database | Supabase | Free tier, Southeast Asia region |
 
 ---
 
-## 6. First Run
+## Support
 
-1. Open the app at `http://localhost:3000`
-2. Click **Create free account** → fill in username, email, password
-3. The 5-step onboarding wizard walks you through:
-   - Setting your monthly income
-   - Choosing your currency
-   - Setting category limits
-   - Adding recurring bills (optional)
-4. You're taken to the dashboard — ready to track!
+FirstFlat is completely free. If it helped you, consider buying me a coffee — it goes toward keeping the app running and getting a real domain.
+
+[![Ko-fi](https://img.shields.io/badge/Support-Ko--fi-orange?style=flat-square&logo=ko-fi)](https://ko-fi.com/kuwago)
 
 ---
 
-## Support ☕
+## Built By
 
-If FirstFlat helped you manage your first apartment budget, consider supporting the developer at [ko-fi.com/kuwago](https://ko-fi.com/kuwago)!
+**Lorenzo Balitian** — Junior Software Developer, Davao, Philippines
 
----
-
-## License
-
-MIT — free to use and modify.
+[![Portfolio](https://img.shields.io/badge/Portfolio-View-blue?style=flat-square)](https://portfolio-xi-liart-nvfg0cuod0.vercel.app)
+[![GitHub](https://img.shields.io/badge/GitHub-Nzo--Cloud-black?style=flat-square&logo=github)](https://github.com/Nzo-Cloud)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/lorenzo-balitian)
