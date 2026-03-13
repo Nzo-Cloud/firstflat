@@ -1,4 +1,5 @@
 'use client'
+import { useState, useEffect } from 'react'
 import { Loader2 } from 'lucide-react'
 
 interface LoadingSpinnerProps {
@@ -7,11 +8,25 @@ interface LoadingSpinnerProps {
 }
 
 export function LoadingSpinner({ text = 'Loading...', size = 'md' }: LoadingSpinnerProps) {
+  const [isSlow, setIsSlow] = useState(false)
   const sizes = { sm: 'w-4 h-4', md: 'w-6 h-6', lg: 'w-10 h-10' }
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsSlow(true), 4000)
+    return () => clearTimeout(timer)
+  }, [])
+
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-8">
       <Loader2 className={`${sizes[size]} animate-spin text-emerald-500`} />
-      {text && <p className="text-sm text-gray-500">{text}</p>}
+      <div className="text-center space-y-2">
+        {text && <p className="text-sm font-medium text-gray-700">{text}</p>}
+        {isSlow && (
+          <p className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-2 rounded-xl animate-fade-in max-w-xs mx-auto shadow-sm">
+            Waking up the free-tier server... this usually takes ~40 seconds. ☕
+          </p>
+        )}
+      </div>
     </div>
   )
 }
